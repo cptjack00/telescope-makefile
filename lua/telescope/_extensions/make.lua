@@ -54,7 +54,7 @@ end
 local function run_target(cmd)
     local target = cmd[1] == config.default_target and "" or cmd[1]
     local run_term = Terminal:new({
-        cmd = config.compiledb_bin .. config.make_bin .. " -C " .. makefile_dir .. " " .. target,
+        cmd = config.compiledb_bin .. " " .. config.make_bin .. " -C " .. makefile_dir .. " " .. target,
         direction = "horizontal",
         close_on_exit = false,
     })
