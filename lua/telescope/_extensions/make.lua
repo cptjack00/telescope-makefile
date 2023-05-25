@@ -8,7 +8,6 @@ local config       = require("telescope-makefile.config")
 local makefile_dir
 local function get_targets()
     local make = config.make_bin
-    local compiledb = config.compiledb
     local data
     -- Check GNU or BSD version
     local hndl = io.popen(make .. " --version 2>/dev/null")
@@ -18,7 +17,7 @@ local function get_targets()
     local is_bsd = hndl:read('*a'):find('GNU') == nil
     for _, make_dir in ipairs(config.makefile_priority) do
         makefile_dir = make_dir
-        local bsdcmd = compiledb .. make .. " -d g1 -rn -C " .. make_dir .. [[ 2>&1 1>/dev/null |
+        local bsdcmd = make .. " -d g1 -rn -C " .. make_dir .. [[ 2>&1 1>/dev/null |
                 awk -F, '/^#\*\*\* Input graph:/,/^$/ {
                     if ($1 ~ "^# "){
                         if ($3 ~ "[|]") {
@@ -27,7 +26,7 @@ local function get_targets()
                         }
                     }
                 }' 2>/dev/null]]
-        local gnucmd = compiledb .. make .. " -pRrq -C " .. make_dir .. [[ 2>/dev/null |
+        local gnucmd = make .. " -pRrq -C " .. make_dir .. [[ 2>/dev/null |
                 awk -F: '/^# Files/,/^# Finished Make data base/ {
                     if ($1 == "# Not a target") skip = 1;
                     if ($1 !~ "^[#.\t]") { if (!skip) {if ($1 !~ "^$")print $1}; skip=0 }
@@ -55,7 +54,7 @@ end
 local function run_target(cmd)
     local target = cmd[1] == config.default_target and "" or cmd[1]
     local run_term = Terminal:new({
-        cmd = config.compiledb .. config.make_bin .. " -C " .. makefile_dir .. " " .. target,
+        cmd = config.compiledb_bin .. config.make_bin .. " -C " .. makefile_dir .. " " .. target,
         direction = "horizontal",
         close_on_exit = false,
     })
